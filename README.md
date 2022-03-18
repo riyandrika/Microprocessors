@@ -4,7 +4,7 @@ Third-year Undergraduate Course at Electrical & Electronic Engineering, Nanyang 
 
 Instructed by Gan Woon Seng, Professor of Audio Engineering
 
-This course gives a strong foundation in microprocessor development, specifically for ARM7 processors. It places a strong emphasis on low-level programming with Assembly and C programming to perform tasks in a microprocessor.
+This course gave a solid foundation in microprocessor development, specifically for ARM7 processors. There was strong emphasis on low-level programming with Assembly and C programming to perform tasks in a microprocessor.
 
 Scope of course: 
 1. Programmer's Model, Assembler Directives
