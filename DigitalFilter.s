@@ -1,0 +1,56 @@
+				AREA L3002B_Q2, CODE, READONLY
+				
+H_ADDR			EQU 0x40000200				
+X_ADDR			EQU	0x40000300
+output_ADDR		EQU	0x40000400
+
+X_reg			RN		0
+H_reg			RN		1
+n_filter		RN		2
+accumulator		RN		3
+output_reg		RN		4
+
+				ENTRY
+				
+main			LDR output_reg, =output_ADDR
+				LDR r5, =X_DATA
+				LDM r5, {r6-r12}  ; Load X_DATA
+				LDR X_reg, =X_ADDR	
+				STMFD X_reg, {r6-r12}
+				LDR r5, =H_DATA
+				LDM r5, {r6-r12}	; Load H_DATA
+				LDR H_reg, =H_ADDR
+				STMFD H_reg, {r6-r12}
+				
+				LDR sp, =0x40000100
+				MOV	accumulator, #0	; initialise accumulator
+				MOV n_filter, #7	; to be used as counter
+				STMFD sp!, {n_filter, accumulator, H_reg, X_reg}
+				
+				BL	multiplyAdd
+				LDMFD sp!, {n_filter, accumulator, H_reg, X_reg}
+				STR accumulator, [output_reg]
+				
+stop			B	stop
+
+multiplyAdd		STMFD sp!, {r5-r8, lr}
+				LDR r5, [sp, #20]	; X_reg
+				LDR r6, [sp, #24]	; H_reg
+				LDR r7, [sp, #28]	; n_filter
+				LDR r8, [sp, #32]	; accumulator
+				
+loop			LDR	r9, [r5, #-4]!	; current_X
+				LDR r10, [r6, #-4]!	; current_H
+				MLA r8, r9, r10, r8	; accumulate
+				SUBS r7, #1			; decrement counter
+				BNE loop			; continue total 7 times
+				
+				LSR r8, #15			;	convert back to Q32.0
+				STR r8, [sp, #32]	
+				LDMFD sp!, {r5-r8, pc}
+				
+				
+X_DATA			DCD 	0x0034, 0x0024, 0x0012, 0x0010, 0x0120, 0x0142, 0x0030
+H_DATA			DCD		0xFFFFFBE7, 0x000004DD, 0x00000625, 0xFFFFF9DB, 0x00000625, 0x000004DD, 0xFFFFFBE7
+				
+				END
